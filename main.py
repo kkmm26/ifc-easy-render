@@ -253,8 +253,74 @@ def unregister_lighting_properties():
     del bpy.types.Scene.hdri_preset
 
 
+"""
+    *******************************************************************
+    Materials & Textures Panel 
+    *******************************************************************
+"""
+
+
+class IFC_PT_MaterialsTextures(bpy.types.Panel):
+    bl_label = "Materials & Textures"
+    bl_idname = "IFC_PT_MATERIALS"
+    bl_parent_id = "IFC_PT_MAINPANEL"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "IFC Easy Render"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        layout = self.layout
+        row = layout.row()
+        layout.prop(context.scene, "material_color", text="Color")
+
+        layout.label(text="Material Properties")
+        layout.operator("material.open_material_asset_library", text="Open Material Asset Library")
+        layout.prop(context.scene, "material_roughness", text="Roughness")
+        layout.prop(context.scene, "material_metallic", text="Metallic")
+
+
+# Operators
+class IFC_OT_OpenMaterialAssetLibrary(bpy.types.Operator):
+    bl_idname = "material.open_material_asset_library"
+    bl_label = "Open Material Asset Library"
+    bl_description = "Open the Material Asset Library folder"
+
+    def execute(self, context):
+        pass
+        return {"FINISHED"}
+
+
+# Properties
+def register_materials_properties():
+    bpy.types.Scene.material_color = bpy.props.EnumProperty(
+        name="Material Color",
+        items=[
+            ("RED", "Red", ""),
+            ("GREEN", "Green", ""),
+            ("BLUE", "Blue", ""),
+            ("YELLOW", "Yellow", ""),
+            ("WHITE", "White", ""),
+            ("BLACK", "Black", ""),
+        ],
+    )
+    bpy.types.Scene.material_roughness = bpy.props.FloatProperty(
+        name="Roughness", default=0.0, min=0.0, max=1.0
+    )
+    bpy.types.Scene.material_metallic = bpy.props.FloatProperty(
+        name="Metallic", default=0.0, min=0.0, max=1.0
+    )
+
+
+def unregister_materials_properties():
+    del bpy.types.Scene.material_color
+    del bpy.types.Scene.material_roughness
+    del bpy.types.Scene.material_metallic
+
+
 classes = [
     IFC_PT_MainPanel,
+    # Camera
     IFC_PT_CameraSetup,
     IFC_PT_SubPanel_PresetPositions,
     IFC_PT_SubPanel_Compositing,
@@ -264,7 +330,11 @@ classes = [
     CAMERA_OT_RandomPerspective,
     CAMERA_OT_AutoFrame,
     CAMERA_OT_SaveSetup,
+    # Lighting
     IFC_PT_LightingSetup,
+    # Materials & Textures
+    IFC_PT_MaterialsTextures,
+    IFC_OT_OpenMaterialAssetLibrary,
 ]
 
 
@@ -273,6 +343,7 @@ def register():
         bpy.utils.register_class(cls)
     register_camera_properties()
     register_lighting_properties()
+    register_materials_properties()
 
 
 def unregister():
@@ -280,6 +351,7 @@ def unregister():
         bpy.utils.unregister_class(cls)
     unregister_camera_properties()
     unregister_lighting_properties()
+    unregister_materials_properties()
 
 
 if __name__ == "__main__":
