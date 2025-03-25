@@ -13,11 +13,13 @@ class IFC_PT_MainPanel(bpy.types.Panel):
         layout = self.layout
         layout.label(text="Visualize and render IFC Models")
 
+
 """
     *******************************************************************
     Camera Setup Panel 
     *******************************************************************
 """
+
 
 class IFC_PT_CameraSetup(bpy.types.Panel):
     bl_label = "Camera Setup"
@@ -187,6 +189,70 @@ def unregister_camera_properties():
     del bpy.types.Scene.camera_setup_name
 
 
+"""
+    *******************************************************************
+    Lighting Setup Panel 
+    *******************************************************************
+"""
+
+
+class IFC_PT_LightingSetup(bpy.types.Panel):
+    bl_label = "Lighting Setup"
+    bl_idname = "IFC_PT_LIGHTINGSETUP"
+    bl_parent_id = "IFC_PT_MAINPANEL"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "IFC Easy Render"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(context.scene, "hdri_preset", text="HDRI Preset")
+        layout.prop(context.scene, "hdri_intensity", text="Intensity")
+
+        layout.label(text="Rotation:")
+        row = layout.row()
+        row.prop(context.scene, "hdri_rotation_x", text="X")
+        row.prop(context.scene, "hdri_rotation_y", text="Y")
+        row.prop(context.scene, "hdri_rotation_z", text="Z")
+
+
+# Properties
+def register_lighting_properties():
+    bpy.types.Scene.hdri_intensity = bpy.props.FloatProperty(
+        name="HDRI Intensity", default=1.0, min=0.1, max=5.0
+    )
+
+    bpy.types.Scene.hdri_rotation_x = bpy.props.FloatProperty(
+        name="HDRI Rotation X", default=0.0, min=0.0, max=360.0
+    )
+
+    bpy.types.Scene.hdri_rotation_y = bpy.props.FloatProperty(
+        name="HDRI Rotation Y", default=0.0, min=0.0, max=360.0
+    )
+
+    bpy.types.Scene.hdri_rotation_z = bpy.props.FloatProperty(
+        name="HDRI Rotation Z", default=0.0, min=0.0, max=360.0
+    )
+
+    bpy.types.Scene.hdri_preset = bpy.props.EnumProperty(
+        name="HDRI Selection",
+        items=[
+            ("SUNNY", "Sunny Day", ""),
+            ("STUDIO", "Studio Light", ""),
+            ("EVENING", "Evening Glow", ""),
+        ],
+    )
+
+
+def unregister_lighting_properties():
+    del bpy.types.Scene.hdri_intensity
+    del bpy.types.Scene.hdri_rotation_x
+    del bpy.types.Scene.hdri_rotation_y
+    del bpy.types.Scene.hdri_rotation_z
+    del bpy.types.Scene.hdri_preset
+
+
 classes = [
     IFC_PT_MainPanel,
     IFC_PT_CameraSetup,
@@ -198,6 +264,7 @@ classes = [
     CAMERA_OT_RandomPerspective,
     CAMERA_OT_AutoFrame,
     CAMERA_OT_SaveSetup,
+    IFC_PT_LightingSetup,
 ]
 
 
@@ -205,12 +272,14 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
     register_camera_properties()
+    register_lighting_properties()
 
 
 def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
     unregister_camera_properties()
+    unregister_lighting_properties()
 
 
 if __name__ == "__main__":
