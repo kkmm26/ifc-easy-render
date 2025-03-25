@@ -394,6 +394,7 @@ def register_entourage_properties():
         name="Rotation Z", default=0.0
     )
 
+
 def unregister_entourage_properties():
     del bpy.types.Scene.entourage_seed
     del bpy.types.Scene.entourage_scale_x
@@ -402,6 +403,97 @@ def unregister_entourage_properties():
     del bpy.types.Scene.entourage_rotation_x
     del bpy.types.Scene.entourage_rotation_y
     del bpy.types.Scene.entourage_rotation_z
+
+
+"""
+    *******************************************************************
+    Render Settings Panel 
+    *******************************************************************
+"""
+
+
+class IFC_PT_RenderSettings(bpy.types.Panel):
+    bl_label = "Render Settings"
+    bl_idname = "IFC_PT_RENDERSETTINGS"
+    bl_parent_id = "IFC_PT_MAINPANEL"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "IFC Easy Render"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(context.scene, "render_presets", text="Presets")
+
+        layout.prop(context.scene, "saved_render_preset", text="Saved Presets")
+
+        # layout.operator("render.save_current_settings", text="Save Current Settings")
+
+
+
+class IFC_PT_SubPanel_ColorManagement(bpy.types.Panel):
+    bl_label = "Color Management"
+    bl_idname = "IFC_PT_SubPanel_COLORMANAGEMENT"
+    bl_parent_id = "IFC_PT_RENDERSETTINGS"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        layout = self.layout
+
+        layout.prop(context.scene, "exposure", text="Exposure")
+        layout.prop(context.scene, "gamma", text="Gamma")
+        
+        row = layout.row()
+        row.prop(context.scene, "preset_name", text="Name")
+        layout.operator("render.save_current_settings")
+
+
+# Operators
+class RENDER_OT_save_current_settings(bpy.types.Operator):
+    bl_label = "Save Current Settings"
+    bl_idname = "render.save_current_settings"
+
+    def execute(self, context):
+        pass
+        return {"FINISHED"}
+
+
+# Properties
+def register_render_properties():
+    bpy.types.Scene.render_presets = bpy.props.EnumProperty(
+        name="Render Presets",
+        items=[
+            ("Clay Render", "Clay Render", ""),
+            ("Preset 1", "Preset 1", ""),
+            ("Preset 2", "Preset 2", ""),
+        ],
+        default="Clay Render",
+    )
+    bpy.types.Scene.saved_render_preset = bpy.props.EnumProperty(
+        name="Saved Presets",
+        items=[],
+        description="Select a saved preset",
+    )
+    bpy.types.Scene.preset_name = bpy.props.StringProperty(
+        name="Preset Name",
+        default="",
+        description="Enter the name for the preset",
+    )
+    bpy.types.Scene.exposure = bpy.props.FloatProperty(
+        name="Exposure", default=1.0, min=0.1, max=5.0
+    )
+    bpy.types.Scene.gamma = bpy.props.FloatProperty(
+        name="Gamma", default=1.0, min=0.1, max=5.0
+    )
+
+def unregister_render_properties():
+    del bpy.types.Scene.render_presets
+    del bpy.types.Scene.saved_render_preset
+    del bpy.types.Scene.preset_name
+    del bpy.types.Scene.exposure
+    del bpy.types.Scene.gammaa
 
 
 classes = [
@@ -425,6 +517,10 @@ classes = [
     IFC_PT_Entourage,
     ENTOURAGE_OT_OpenAssetBrowser,
     ENTOURAGE_OT_Scatter,
+    # Render Settings
+    IFC_PT_RenderSettings,
+    IFC_PT_SubPanel_ColorManagement,
+    RENDER_OT_save_current_settings,
 ]
 
 
@@ -435,6 +531,7 @@ def register():
     register_lighting_properties()
     register_materials_properties()
     register_entourage_properties()
+    register_render_properties()
 
 
 def unregister():
@@ -444,6 +541,7 @@ def unregister():
     unregister_lighting_properties()
     unregister_materials_properties()
     unregister_entourage_properties()
+    unregister_render_properties()
 
 
 if __name__ == "__main__":
