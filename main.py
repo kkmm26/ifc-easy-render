@@ -275,7 +275,9 @@ class IFC_PT_MaterialsTextures(bpy.types.Panel):
         layout.prop(context.scene, "material_color", text="Color")
 
         layout.label(text="Material Properties")
-        layout.operator("material.open_material_asset_library", text="Open Material Asset Library")
+        layout.operator(
+            "material.open_material_asset_library", text="Open Material Asset Library"
+        )
         layout.prop(context.scene, "material_roughness", text="Roughness")
         layout.prop(context.scene, "material_metallic", text="Metallic")
 
@@ -318,6 +320,90 @@ def unregister_materials_properties():
     del bpy.types.Scene.material_metallic
 
 
+"""
+    *******************************************************************
+    Entourage Panel 
+    *******************************************************************
+"""
+
+
+class IFC_PT_Entourage(bpy.types.Panel):
+    bl_label = "Entourage"
+    bl_idname = "IFC_PT_ENTOURAGE"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "IFC Easy Render"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("entourage.open_asset_browser")
+        layout.operator("entourage.scatter")
+
+        layout.label(text="Scale:")
+        row = layout.row()
+        row.prop(context.scene, "entourage_scale_x", text="X")
+        row.prop(context.scene, "entourage_scale_y", text="Y")
+        row.prop(context.scene, "entourage_scale_z", text="Z")
+
+        layout.label(text="Rotation:")
+        row = layout.row()
+        row.prop(context.scene, "entourage_rotation_x", text="X")
+        row.prop(context.scene, "entourage_rotation_y", text="Y")
+        row.prop(context.scene, "entourage_rotation_z", text="Z")
+
+        layout.prop(context.scene, "entourage_seed", text="Seed")
+
+
+# Operators
+class ENTOURAGE_OT_OpenAssetBrowser(bpy.types.Operator):
+    bl_label = "Open Entourage Asset Library"
+    bl_idname = "entourage.open_asset_browser"
+
+    def execute(self, context):
+        return {"FINISHED"}
+
+
+class ENTOURAGE_OT_Scatter(bpy.types.Operator):
+    bl_label = "Scatter Entourage"
+    bl_idname = "entourage.scatter"
+
+    def execute(self, context):
+        return {"FINISHED"}
+
+
+# Properties
+def register_entourage_properties():
+    bpy.types.Scene.entourage_seed = bpy.props.FloatProperty(name="Seed", default=1.0)
+    bpy.types.Scene.entourage_scale_x = bpy.props.FloatProperty(
+        name="Scale X", default=1.0
+    )
+    bpy.types.Scene.entourage_scale_y = bpy.props.FloatProperty(
+        name="Scale Y", default=1.0
+    )
+    bpy.types.Scene.entourage_scale_z = bpy.props.FloatProperty(
+        name="Scale Z", default=1.0
+    )
+    bpy.types.Scene.entourage_rotation_x = bpy.props.FloatProperty(
+        name="Rotation X", default=0.0
+    )
+    bpy.types.Scene.entourage_rotation_y = bpy.props.FloatProperty(
+        name="Rotation Y", default=0.0
+    )
+    bpy.types.Scene.entourage_rotation_z = bpy.props.FloatProperty(
+        name="Rotation Z", default=0.0
+    )
+
+def unregister_entourage_properties():
+    del bpy.types.Scene.entourage_seed
+    del bpy.types.Scene.entourage_scale_x
+    del bpy.types.Scene.entourage_scale_y
+    del bpy.types.Scene.entourage_scale_z
+    del bpy.types.Scene.entourage_rotation_x
+    del bpy.types.Scene.entourage_rotation_y
+    del bpy.types.Scene.entourage_rotation_z
+
+
 classes = [
     IFC_PT_MainPanel,
     # Camera
@@ -335,6 +421,10 @@ classes = [
     # Materials & Textures
     IFC_PT_MaterialsTextures,
     IFC_OT_OpenMaterialAssetLibrary,
+    # Entourage
+    IFC_PT_Entourage,
+    ENTOURAGE_OT_OpenAssetBrowser,
+    ENTOURAGE_OT_Scatter,
 ]
 
 
@@ -344,6 +434,7 @@ def register():
     register_camera_properties()
     register_lighting_properties()
     register_materials_properties()
+    register_entourage_properties()
 
 
 def unregister():
@@ -352,6 +443,7 @@ def unregister():
     unregister_camera_properties()
     unregister_lighting_properties()
     unregister_materials_properties()
+    unregister_entourage_properties()
 
 
 if __name__ == "__main__":
