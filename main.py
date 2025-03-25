@@ -1,0 +1,217 @@
+import bpy
+
+
+# Main Panel
+class IFC_PT_MainPanel(bpy.types.Panel):
+    bl_label = "IFC Easy Render"
+    bl_idname = "IFC_PT_MAINPANEL"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "IFC Easy Render"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.label(text="Visualize and render IFC Models")
+
+"""
+    *******************************************************************
+    Camera Setup Panel 
+    *******************************************************************
+"""
+
+class IFC_PT_CameraSetup(bpy.types.Panel):
+    bl_label = "Camera Setup"
+    bl_idname = "IFC_PT_CAMERASETUP"
+    bl_parent_id = "IFC_PT_MAINPANEL"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("camera.add_camera")
+
+
+# Preset Camera Positions Subpanel
+class IFC_PT_SubPanel_PresetPositions(bpy.types.Panel):
+    bl_label = "Preset Camera Positions"
+    bl_idname = "IFC_PT_SUBPANEL_PRESETPOSITIONS"
+    bl_parent_id = "IFC_PT_CAMERASETUP"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(context.scene, "camera_angle", text="Common Angles")
+        layout.prop(context.scene, "saved_camera_angle", text="Saved Angles")
+        layout.operator("camera.random_perspective", text="Random Perspective")
+
+
+# Compositing Subpanel
+class IFC_PT_SubPanel_Compositing(bpy.types.Panel):
+    bl_label = "Compositing"
+    bl_idname = "IFC_PT_SUBPANEL_COMPOSITING"
+    bl_parent_id = "IFC_PT_CAMERASETUP"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(context.scene, "camera_aspect_ratio", text="Aspect Ratio")
+
+
+# Settings Subpanel
+class IFC_PT_SubPanel_CameraSettings(bpy.types.Panel):
+    bl_label = "Settings"
+    bl_idname = "IFC_PT_SUBPANEL_CAMERASETTINGS"
+    bl_parent_id = "IFC_PT_CAMERASETUP"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.label(text="Positioning")
+        layout.prop(context.scene, "camera_distance", text="Distance")
+        layout.prop(context.scene, "camera_height_offset", text="Height Offset")
+        layout.prop(context.scene, "camera_orbit_angle", text="Orbit Angle")
+        layout.operator("camera.auto_frame", text="Auto-Frame")
+
+        layout.label(text="Lens")
+        layout.prop(context.scene, "camera_focal_length", text="Focal Length")
+        layout.prop(context.scene, "camera_depth_of_field", text="Depth of Field")
+
+
+# Saving Subpanel
+class IFC_PT_SubPanel_CameraSaving(bpy.types.Panel):
+    bl_label = "Saving"
+    bl_idname = "IFC_PT_SUBPANEL_CAMERASAVING"
+    bl_parent_id = "IFC_PT_CAMERASETUP"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(context.scene, "camera_setup_name", text="Name")
+        layout.operator("camera.save_setup", text="Save Current Setup")
+
+
+# Operators
+class CAMERA_OT_AddCamera(bpy.types.Operator):
+    bl_label = "Add Camera"
+    bl_idname = "camera.add_camera"
+
+    def execute(self, context):
+        return {"FINISHED"}
+
+
+class CAMERA_OT_RandomPerspective(bpy.types.Operator):
+    bl_label = "Random Perspective"
+    bl_idname = "camera.random_perspective"
+
+    def execute(self, context):
+        return {"FINISHED"}
+
+
+class CAMERA_OT_AutoFrame(bpy.types.Operator):
+    bl_label = "Auto-Frame"
+    bl_idname = "camera.auto_frame"
+
+    def execute(self, context):
+        return {"FINISHED"}
+
+
+class CAMERA_OT_SaveSetup(bpy.types.Operator):
+    bl_label = "Save Current Setup"
+    bl_idname = "camera.save_setup"
+
+    def execute(self, context):
+        return {"FINISHED"}
+
+
+#  Properties
+def register_camera_properties():
+    bpy.types.Scene.camera_angle = bpy.props.EnumProperty(
+        name="Camera Angle",
+        items=[
+            ("TOP", "Top", ""),
+            ("FRONT", "Front", ""),
+            ("BACK", "Back", ""),
+            ("LEFT", "Left", ""),
+            ("RIGHT", "Right", ""),
+            ("PERSPECTIVE", "Perspective", ""),
+        ],
+    )
+    bpy.types.Scene.saved_camera_angle = bpy.props.EnumProperty(
+        name="Saved Angles",
+        items=[],
+    )
+    bpy.types.Scene.camera_distance = bpy.props.FloatProperty(
+        name="Distance", default=10.0, min=1.0, max=100.0
+    )
+    bpy.types.Scene.camera_height_offset = bpy.props.FloatProperty(
+        name="Height Offset", default=0.0, min=-10.0, max=10.0
+    )
+    bpy.types.Scene.camera_orbit_angle = bpy.props.FloatProperty(
+        name="Orbit Angle", default=0.0, min=-180.0, max=180.0
+    )
+    bpy.types.Scene.camera_focal_length = bpy.props.FloatProperty(
+        name="Focal Length", default=50.0, min=10.0, max=300.0
+    )
+    bpy.types.Scene.camera_depth_of_field = bpy.props.BoolProperty(
+        name="Depth of Field", default=False
+    )
+    bpy.types.Scene.camera_setup_name = bpy.props.StringProperty(
+        name="Setup Name", default=""
+    )
+    bpy.types.Scene.camera_aspect_ratio = bpy.props.EnumProperty(
+        name="Aspect Ratio",
+        items=[
+            ("16:9", "16:9", ""),
+            ("4:3", "4:3", ""),
+            ("1:1", "1:1", ""),
+            ("21:9", "21:9", ""),
+        ],
+        default="16:9",
+    )
+
+
+def unregister_camera_properties():
+    del bpy.types.Scene.camera_aspect_ratio
+    del bpy.types.Scene.camera_angle
+    del bpy.types.Scene.saved_camera_angle
+    del bpy.types.Scene.camera_distance
+    del bpy.types.Scene.camera_height_offset
+    del bpy.types.Scene.camera_orbit_angle
+    del bpy.types.Scene.camera_focal_length
+    del bpy.types.Scene.camera_depth_of_field
+    del bpy.types.Scene.camera_setup_name
+
+
+classes = [
+    IFC_PT_MainPanel,
+    IFC_PT_CameraSetup,
+    IFC_PT_SubPanel_PresetPositions,
+    IFC_PT_SubPanel_Compositing,
+    IFC_PT_SubPanel_CameraSettings,
+    IFC_PT_SubPanel_CameraSaving,
+    CAMERA_OT_AddCamera,
+    CAMERA_OT_RandomPerspective,
+    CAMERA_OT_AutoFrame,
+    CAMERA_OT_SaveSetup,
+]
+
+
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+    register_camera_properties()
+
+
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)
+    unregister_camera_properties()
+
+
+if __name__ == "__main__":
+    register()
